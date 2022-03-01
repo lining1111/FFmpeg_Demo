@@ -1,10 +1,13 @@
 ## 07-FFmpeg的基本操作
 
 ### 7.1 FFmpeg概述
+
     ffplay视频播放器
     ffprobe 媒体信息解析器
     ffmpeg
+
 ### 7.2 ffplay的基本使用方法
+
     显示版本    ffplay -version
     显示编译选项  ffplay -buildconf
     设置日志级别  ffplay -loglevel debug -i input.avi 
@@ -23,6 +26,7 @@
                 -y height 指定播放窗口的高度
 
 ### 7.3 ffprobe的基本使用方法
+
     显示全部信息 ffprobe -i input.avi
     显示更详细的封装格式信息 ffprobe -show_format -i test.mp4
     显示每一路媒体流信息 ffprobe -show_streams -i test.mp4
@@ -38,6 +42,7 @@
         ffprobe -show_frames -of json=c=1 -i test.mp4
 
 ### 7.4 ffmpeg的基本使用方法
+
     显示版本 ffmpeg -version
     查看编译配置参数 ffmpeg -buildconf
     显示支持的解复用器格式 ffmpeg -demuxers
