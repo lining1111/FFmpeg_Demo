@@ -1,2 +1,2 @@
-add_executable(getListInfo chapter10.cpp)
-target_link_libraries(getListInfo ${FFMPEG_LIBS} ${LINK_LIBS})
+add_executable(cmd_dir cmd_dir.cpp )
+target_link_libraries(cmd_dir ${FFMPEG_LIBS} ${LINK_LIBS})
