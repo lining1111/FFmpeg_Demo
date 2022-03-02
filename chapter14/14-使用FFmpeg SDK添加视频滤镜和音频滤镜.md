@@ -4,7 +4,12 @@
 
 ### 14.1 视频滤镜
 
+    可以对照源码中doc/examples/filtering_video.c
+
     AVFilterGraph 滤镜图结构，视频滤镜最核心的功能
     avfilter_graph_alloc 创建并初始化一个滤镜图结构
 
 ### 14.2 音频滤镜
+
+    可以对照源码中doc/examples/filter_audio.c
+    

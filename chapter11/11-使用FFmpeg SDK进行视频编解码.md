@@ -5,6 +5,8 @@
 
 ### 11.1 libavcodec 视频编码
 
+    可以对照源码中doc/examples/encode_video.c
+
     avcodec_find_encoder_by_name 传入字符串类型的编码器名称即可查找对应的编码器实例，
         具体的字符串内容，参考源码libavcodec/allcodecs.c中AVCodec类型的ff_xxxx_encoder
             如：传入libx264 使用x264编码器编码
@@ -31,6 +33,8 @@
     avcodec_receive_packet 从编码器获取输出的码流
 
 ### 11.2 libavcodec 视频解码
+
+    可以对照源码中doc/examples/decode_video.c
 
     AVCodecParserContext 是码流解析器的句柄，其作用是从一串二进制数据流中解析出符合某种编码标准的码流包
     使用av_parser_init可以根据指定的codec_id创建AVCodecParserContext
