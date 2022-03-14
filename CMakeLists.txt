@@ -23,3 +23,5 @@ add_subdirectory(chapter12)
 add_subdirectory(chapter13)
 add_subdirectory(chapter14)
 add_subdirectory(chapter15)
+
+add_subdirectory(Tutorial/SDK_Demo)

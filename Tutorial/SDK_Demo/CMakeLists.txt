@@ -1,0 +1,8 @@
+add_subdirectory(AVIOTest)
+add_subdirectory(VideoDecoding)
+add_subdirectory(VideoEncoding)
+add_subdirectory(VideoEncodingMuxing)
+add_subdirectory(VideoRemuxing)
+add_subdirectory(VideoDemuxing)
+add_subdirectory(VideoFiltering)
+add_subdirectory(VideoScaling)
