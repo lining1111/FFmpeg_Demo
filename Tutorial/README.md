@@ -142,7 +142,7 @@ ffmpeg.exe可谓是整个工程的核心所在，它的主要功能是完成音�
 
 	avcodec_register_all();
 
-编解码器注册完成之后，根据指定的CODEC_ID查找指定的codec实例。CODEC_ID通常指定了编解码器的格式，在这里我们使用当前应用最为广泛的H.264格式为例。查找codec调用的函数为avcodec\_find_encoder，其声明格式为：
+编解码器注册完成之后，根据指定的CODEC_ID查找指定的codec实例。CODEC_ID通常指定了编解码器的格式，在这里我们使用当前应用最为广泛的H.264格式为例。查找codec调用的函数为avcodec_find_encoder，其声明格式为：
 
 	AVCodec *avcodec_find_encoder(enum AVCodecID id);
 
@@ -156,11 +156,11 @@ ffmpeg.exe可谓是整个工程的核心所在，它的主要功能是完成音�
 		return false;
 	}
 
-AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecContext实例需要我们前面查找到的AVCodec作为参数，调用的是avcodec\_alloc_context3函数。其声明方式为：
+AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecContext实例需要我们前面查找到的AVCodec作为参数，调用的是avcodec_alloc_context3函数。其声明方式为：
 
 	AVCodecContext *avcodec_alloc_context3(const AVCodec *codec);
 
-其特点同avcodec\_find_encoder类似，返回一个指向AVCodecContext实例的指针。如果分配失败，会返回一个空指针。调用方式为：
+其特点同avcodec_find_encoder类似，返回一个指向AVCodecContext实例的指针。如果分配失败，会返回一个空指针。调用方式为：
 
 	ctx.c = avcodec_alloc_context3(ctx.codec);			//分配AVCodecContext实例
 	if (!ctx.c)
@@ -171,7 +171,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 
 需注意，在分配成功之后，应将编码的参数设置赋值给AVCodecContext的成员。
 
-现在，AVCodec、AVCodecContext的指针都已经分配好，然后以这两个对象的指针作为参数打开编码器对象。调用的函数为avcodec\_open2，声明方式为：
+现在，AVCodec、AVCodecContext的指针都已经分配好，然后以这两个对象的指针作为参数打开编码器对象。调用的函数为avcodec_open2，声明方式为：
 
 	int avcodec_open2(AVCodecContext *avctx, const AVCodec *codec, AVDictionary **options);
 
@@ -183,7 +183,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 		exit(1);
 	}
 
-然后，我们需要处理AVFrame对象。AVFrame表示视频原始像素数据的一个容器，处理该类型数据需要两个步骤，其一是分配AVFrame对象，其二是分配实际的像素数据的存储空间。分配对象空间类似于new操作符一样，只是需要调用函数av\_frame_alloc。如果失败，那么函数返回一个空指针。AVFrame对象分配成功后，需要设置图像的分辨率和像素格式等。实际调用过程如下：
+然后，我们需要处理AVFrame对象。AVFrame表示视频原始像素数据的一个容器，处理该类型数据需要两个步骤，其一是分配AVFrame对象，其二是分配实际的像素数据的存储空间。分配对象空间类似于new操作符一样，只是需要调用函数av_frame_alloc。如果失败，那么函数返回一个空指针。AVFrame对象分配成功后，需要设置图像的分辨率和像素格式等。实际调用过程如下：
 
 	ctx.frame = av_frame_alloc();						//分配AVFrame对象
 	if (!ctx.frame) 
@@ -195,7 +195,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 	ctx.frame->width = ctx.c->width;
 	ctx.frame->height = ctx.c->height;
 
-分配像素的存储空间需要调用av\_image_alloc函数，其声明方式为：
+分配像素的存储空间需要调用av_image_alloc函数，其声明方式为：
 
 	int av_image_alloc(uint8_t *pointers[4], int linesizes[4], int w, int h, enum AVPixelFormat pix_fmt, int align);
 
@@ -219,11 +219,11 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 		write_out_h264();
 	}
 
-其中，read\_yuv_data部分直接使用fread语句读取即可，只需要知道的是，三个颜色分量Y/U/V的地址分别为AVframe::data[0]、AVframe::data[1]和AVframe::data[2]，图像的宽度分别为AVframe::linesize[0]、AVframe::linesize[1]和AVframe::linesize[2]。需要注意的是，linesize中的值通常指的是stride而不是width，也就是说，像素保存区可能是带有一定宽度的无效边区的，在读取数据时需注意。
+其中，read_yuv_data部分直接使用fread语句读取即可，只需要知道的是，三个颜色分量Y/U/V的地址分别为AVframe::data[0]、AVframe::data[1]和AVframe::data[2]，图像的宽度分别为AVframe::linesize[0]、AVframe::linesize[1]和AVframe::linesize[2]。需要注意的是，linesize中的值通常指的是stride而不是width，也就是说，像素保存区可能是带有一定宽度的无效边区的，在读取数据时需注意。
 
-编码前另外需要完成的操作时初始化AVPacket对象。该对象保存了编码之后的码流数据。对其进行初始化的操作非常简单，只需要调用av\_init_packet并传入AVPacket对象的指针。随后将AVPacket::data设为NULL，AVPacket::size赋值0.
+编码前另外需要完成的操作时初始化AVPacket对象。该对象保存了编码之后的码流数据。对其进行初始化的操作非常简单，只需要调用av_init_packet并传入AVPacket对象的指针。随后将AVPacket::data设为NULL，AVPacket::size赋值0.
 
-成功将原始的YUV像素值保存到了AVframe结构中之后，便可以调用avcodec\_encode_video2函数进行实际的编码操作。该函数可谓是整个工程的核心所在，其声明方式为：
+成功将原始的YUV像素值保存到了AVframe结构中之后，便可以调用avcodec_encode_video2函数进行实际的编码操作。该函数可谓是整个工程的核心所在，其声明方式为：
 
 	int avcodec_encode_video2(AVCodecContext *avctx, AVPacket *avpkt, const AVFrame *frame, int *got_packet_ptr);
 
@@ -289,7 +289,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 
 #### (4)、收尾处理
 
-如果我们就此结束编码器的整个运行过程，我们会发现，编码完成之后的码流对比原来的数据少了一帧。这是因为我们是根据读取原始像素数据结束来判断循环结束的，这样最后一帧还保留在编码器中尚未输出。所以在关闭整个解码过程之前，我们必须继续执行编码的操作，直到将最后一帧输出为止。执行这项操作依然调用avcodec\_encode_video2函数，只是表示AVFrame的参数设为NULL即可：
+如果我们就此结束编码器的整个运行过程，我们会发现，编码完成之后的码流对比原来的数据少了一帧。这是因为我们是根据读取原始像素数据结束来判断循环结束的，这样最后一帧还保留在编码器中尚未输出。所以在关闭整个解码过程之前，我们必须继续执行编码的操作，直到将最后一帧输出为止。执行这项操作依然调用avcodec_encode_video2函数，只是表示AVFrame的参数设为NULL即可：
 
 	/* get the delayed frames */
 	for (got_output = 1; got_output; frameIdx++) 
@@ -323,9 +323,9 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 使用FFMpeg进行视频编码的主要流程如：
 
 1. 首先解析、处理输入参数，如编码器的参数、图像的参数、输入输出文件；
-2. 建立整个FFMpeg编码器的各种组件工具，顺序依次为：avcodec\_register\_all \-> avcodec\_find_encoder \-> avcodec\_alloc\_context3 \->  avcodec\_open2 \-> av\_frame\_alloc \->  av\_image\_alloc;
-3. 编码循环：av\_init_packet \-> avcodec\_encode\_video2(两次) \-> av\_packet\_unref
-4. 关闭编码器组件：avcodec\_close，av\_free，av\_freep，av\_frame\_free
+2. 建立整个FFMpeg编码器的各种组件工具，顺序依次为：avcodec_register_all -> avcodec_find_encoder -> avcodec_alloc_context3 ->  avcodec_open2 -> av_frame_alloc ->  av_image_alloc;
+3. 编码循环：av_init_packet -> avcodec_encode_video2(两次) -> av_packet_unref
+4. 关闭编码器组件：avcodec_close，av_free，av_freep，av_frame_free
 
 ---
 ## 三、调用FFmpeg SDK对H.264格式的视频压缩码流进行解码
@@ -363,7 +363,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 
 	avcodec_register_all();
 
-编解码器注册完成之后，根据指定的CODEC_ID查找指定的codec实例。CODEC_ID通常指定了编解码器的格式，在这里我们使用当前应用最为广泛的H.264格式为例。查找codec调用的函数为avcodec\_find_encoder，其声明格式为：
+编解码器注册完成之后，根据指定的CODEC_ID查找指定的codec实例。CODEC_ID通常指定了编解码器的格式，在这里我们使用当前应用最为广泛的H.264格式为例。查找codec调用的函数为avcodec_find_encoder，其声明格式为：
 
 	AVCodec *avcodec_find_encoder(enum AVCodecID id);
 
@@ -377,11 +377,11 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 		return false;
 	}
 
-AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecContext实例需要我们前面查找到的AVCodec作为参数，调用的是avcodec\_alloc_context3函数。其声明方式为：
+AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecContext实例需要我们前面查找到的AVCodec作为参数，调用的是avcodec_alloc_context3函数。其声明方式为：
 
 	AVCodecContext *avcodec_alloc_context3(const AVCodec *codec);
 
-其特点同avcodec\_find_encoder类似，返回一个指向AVCodecContext实例的指针。如果分配失败，会返回一个空指针。调用方式为：
+其特点同avcodec_find_encoder类似，返回一个指向AVCodecContext实例的指针。如果分配失败，会返回一个空指针。调用方式为：
 
 	ctx.c = avcodec_alloc_context3(ctx.codec);			//分配AVCodecContext实例
 	if (!ctx.c)
@@ -428,7 +428,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 
 首先按照某个指定的长度读取一段码流保存到缓存区中。
 
-由于H.264中一个包的长度是不定的，我们读取一段固定长度的码流通常不可能刚好读出一个包的长度。所以我们就需要使用AVCodecParserContext结构对我们读出的码流信息进行解析，直到取出一个完整的H.264包。对码流解析的函数为av\_parser_parse2，声明方式如：
+由于H.264中一个包的长度是不定的，我们读取一段固定长度的码流通常不可能刚好读出一个包的长度。所以我们就需要使用AVCodecParserContext结构对我们读出的码流信息进行解析，直到取出一个完整的H.264包。对码流解析的函数为av_parser_parse2，声明方式如：
 
 	int av_parser_parse2(AVCodecParserContext *s,
                      AVCodecContext *avctx,
@@ -457,13 +457,13 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 
 如果参数poutbuf_size的值为0，那么应继续解析缓存中剩余的码流；如果缓存中的数据全部解析后依然未能找到一个完整的包，那么继续从输入文件中读取数据到缓存，继续解析操作，直到pkt.size不为0为止。
 
-在最终解析出一个完整的包之后，我们就可以调用解码API进行实际的解码过程了。解码过程调用的函数为avcodec\_decode_video2，该函数的声明为：
+在最终解析出一个完整的包之后，我们就可以调用解码API进行实际的解码过程了。解码过程调用的函数为avcodec_decode_video2，该函数的声明为：
 
 	int avcodec_decode_video2(AVCodecContext *avctx, AVFrame *picture,
                          int *got_picture_ptr,
                          const AVPacket *avpkt);
 
-这个函数与前篇所遇到的编码函数avcodec\_encode_video2有些类似，只是参数的顺序略有不同，解码函数的输入输出参数与编码函数相比交换了位置。该函数各个参数的意义：
+这个函数与前篇所遇到的编码函数avcodec_encode_video2有些类似，只是参数的顺序略有不同，解码函数的输入输出参数与编码函数相比交换了位置。该函数各个参数的意义：
 
 - **AVCodecContext \*avctx**：编解码器上下文对象，在打开编解码器时生成；
 - **AVFrame \*picture**: 保存解码完成后的像素数据；我们只需要分配对象的空间，像素的空间codec会为我们分配好；
@@ -486,7 +486,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 		printf("Succeed to decode 1 frame!\n");
 	}
 
-最后，同编码器一样，解码过程的最后一帧可能也存在延迟。处理最后这一帧的方法也跟解码器类似：将AVPacket::data设为NULL，AVPacket::size设为0，然后在调用avcodec\_encode_video2完成最后的解码过程：
+最后，同编码器一样，解码过程的最后一帧可能也存在延迟。处理最后这一帧的方法也跟解码器类似：将AVPacket::data设为NULL，AVPacket::size设为0，然后在调用avcodec_encode_video2完成最后的解码过程：
 
 	ctx.pkt.data = NULL;
     ctx.pkt.size = 0;
@@ -522,7 +522,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 
 解码器的流程与编码器类似，只是中间需要加入一个解析的过程。整个流程大致为：
 
-1.读取码流数据 -> 2.解析数据，是否尚未解析出一个包就已经用完？是返回1，否继续 -> 3.解析出一个包？是则继续，否则返回上一步继续解析 -> 4.调用avcodec\_decode_video2进行解码 -> 5.是否解码出一帧完整的图像？是则继续，否则返回上一步继续解码 -> 6.写出图像数据 -> 返回步骤2继续解析。
+1.读取码流数据 -> 2.解析数据，是否尚未解析出一个包就已经用完？是返回1，否继续 -> 3.解析出一个包？是则继续，否则返回上一步继续解析 -> 4.调用avcodec_decode_video2进行解码 -> 5.是否解码出一帧完整的图像？是则继续，否则返回上一步继续解码 -> 6.写出图像数据 -> 返回步骤2继续解析。
 
 ---
 ## 四、调用FFmpeg SDK解析封装格式的视频为音频流和视频流
@@ -572,7 +572,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 
 	av_register_all();
 
-随后，我们需要打开待处理的音视频文件。然而在此我们不使用打开文件的fopen函数，而是使用avformat\_open_input函数。该函数不但会打开输入文件，而且可以根据输入文件读取相应的格式信息。该函数的声明如下：
+随后，我们需要打开待处理的音视频文件。然而在此我们不使用打开文件的fopen函数，而是使用avformat_open_input函数。该函数不但会打开输入文件，而且可以根据输入文件读取相应的格式信息。该函数的声明如下：
 
 	int avformat_open_input(AVFormatContext **ps, const char *url, AVInputFormat *fmt, AVDictionary **options);
 
@@ -592,7 +592,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 		return -1;
 	}
 
-打开文件后，调用avformat\_find_stream_info函数获取文件中的流信息。该函数的声明为：
+打开文件后，调用avformat_find_stream_info函数获取文件中的流信息。该函数的声明为：
 
 	int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options);
 
@@ -605,7 +605,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 		return -1;
 	}
 
-获取文件中的流信息后，下一步则是获取文件中的音频和视频流，并准备对音频和视频信息进行解码。获取文件中的流使用av\_find\_best\_stream函数，其声明如：
+获取文件中的流信息后，下一步则是获取文件中的音频和视频流，并准备对音频和视频信息进行解码。获取文件中的流使用av_find_best_stream函数，其声明如：
 
 	int av_find_best_stream(AVFormatContext *ic,
                         enum AVMediaType type,
@@ -624,7 +624,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 - **flags**：未定义；
 - 返回值：函数执行成功返回流的数量，失败则返回负的错误码；
 
-在函数执行成功后，便可调用avcodec\_find_decoder和avcodec\_open2打开解码器准备解码音视频流。该部分的代码实现如：
+在函数执行成功后，便可调用avcodec_find_decoder和avcodec_open2打开解码器准备解码音视频流。该部分的代码实现如：
 
 	static int open_codec_context(IOFileName &files, DemuxingVideoAudioContex &va_ctx, enum AVMediaType type)
 	{
@@ -794,7 +794,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 		av_packet_unref(&orig_pkt);
 	}
 
-这部分代码逻辑上非常简单，首先调用av\_read_frame函数，从文件中读取一个packet的数据，并实现了一个Decode\_packet对这个packet进行解码。Decode\_packet函数的实现如下：
+这部分代码逻辑上非常简单，首先调用av_read_frame函数，从文件中读取一个packet的数据，并实现了一个Decode_packet对这个packet进行解码。Decode_packet函数的实现如下：
 
 	int Decode_packet(IOFileName &files, DemuxingVideoAudioContex &va_ctx, int *got_frame, int cached)
 	{
@@ -888,11 +888,11 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 			return decoded;
 	}
 
-在该函数中，首先对读取到的packet中的stream_index分别于先前获取的音频和视频的stream_index进行对比来确定是音频还是视频流。而后分别调用相应的解码函数进行解码，以视频流为例，判断当前stream为视频流后，调用avcodec\_decode_video2函数将流数据解码为像素数据，并在获取完整的一帧之后，将其写出到输出文件中。
+在该函数中，首先对读取到的packet中的stream_index分别于先前获取的音频和视频的stream_index进行对比来确定是音频还是视频流。而后分别调用相应的解码函数进行解码，以视频流为例，判断当前stream为视频流后，调用avcodec_decode_video2函数将流数据解码为像素数据，并在获取完整的一帧之后，将其写出到输出文件中。
 
 ### 3、总结
 
-相对于前文讲述过的解码H.264格式裸码流，解封装+解码过程看似多了一个步骤，然而在实现起来实际上并无过多差别。这主要是由于FFMpeg中的多个API已经很好地实现了封装文件的解析和读取过程，如打开文件我们使用avformat\_open_input代替fopen，读取数据包使用av\_read_frame代替fread，其他方面只需要多一步判断封装文件中数据流的类型即可，剩余部分与裸码流的解码并无太多差别。
+相对于前文讲述过的解码H.264格式裸码流，解封装+解码过程看似多了一个步骤，然而在实现起来实际上并无过多差别。这主要是由于FFMpeg中的多个API已经很好地实现了封装文件的解析和读取过程，如打开文件我们使用avformat_open_input代替fopen，读取数据包使用av_read_frame代替fread，其他方面只需要多一步判断封装文件中数据流的类型即可，剩余部分与裸码流的解码并无太多差别。
 
 ---
 
@@ -908,7 +908,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 
 ### 1. 相关数据结构的准备 
 
-首先，根据输出文件的格式获取AVFormatContext结构，获取AVFormatContext结构使用函数avformat\_alloc\_output\_context2实现。该函数的声明为：
+首先，根据输出文件的格式获取AVFormatContext结构，获取AVFormatContext结构使用函数avformat_alloc_output_context2实现。该函数的声明为：
 
 	int avformat_alloc_output_context2(AVFormatContext **ctx, AVOutputFormat *oformat, const char *format_name, const char *filename);
 
@@ -919,7 +919,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 - format_name：输出格式的名称，如果设为NULL则使用filename默认格式；
 - filename：目标文件名，如果不使用，可以设为NULL；
 
-分配AVFormatContext成功后，我们需要添加希望封装的数据流，一般是一路视频流+一路音频流（可能还有其他音频流和字幕流等）。添加流首先需要查找流所包含的媒体的编码器，这需要传入codec_id后使用avcodec\_find\_encoder函数实现，将查找到的编码器保存在AVCodec指针中。
+分配AVFormatContext成功后，我们需要添加希望封装的数据流，一般是一路视频流+一路音频流（可能还有其他音频流和字幕流等）。添加流首先需要查找流所包含的媒体的编码器，这需要传入codec_id后使用avcodec_find_encoder函数实现，将查找到的编码器保存在AVCodec指针中。
 
 之后，调用avformat_new_stream函数向AVFormatContext结构中所代表的媒体文件中添加数据流。该函数的声明如下：
 
@@ -1035,7 +1035,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 
 ### 2. 打开音视频
 
-打开音视频主要涉及到打开编码音视频数据所需要的编码器，以及分配相应的frame对象。其中打开编码器如之前一样，调用avcodec\_open函数，分配frame对象调用av\_frame\_alloc以及av\_frame\_get\_buffer。分配frame对象的实现如下：
+打开音视频主要涉及到打开编码音视频数据所需要的编码器，以及分配相应的frame对象。其中打开编码器如之前一样，调用avcodec_open函数，分配frame对象调用av_frame_alloc以及av_frame_get_buffer。分配frame对象的实现如下：
 
 	static AVFrame *alloc_picture(enum AVPixelFormat pix_fmt, int width, int height)
 	{
@@ -1116,7 +1116,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 
 ### 3. 打开输出文件并写入文件头
 
-如果判断需要写出文件的话，则需要打开输出文件。在这里，我们可以不再定义输出文件指针，并使用fopen打开，而是直接使用FFMpeg的API——avio\_open来实现输出文件的打开功能。该函数的声明如下：
+如果判断需要写出文件的话，则需要打开输出文件。在这里，我们可以不再定义输出文件指针，并使用fopen打开，而是直接使用FFMpeg的API——avio_open来实现输出文件的打开功能。该函数的声明如下：
 
 	int avio_open(AVIOContext **s, const char *url, int flags);
 
@@ -1139,7 +1139,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 		}
 	}
 
-写入文件头操作是生成视频文件中极为重要的一步，而实现过程却非常简单，只需要通过函数avformat\_write_header即可，该函数的声明为：
+写入文件头操作是生成视频文件中极为重要的一步，而实现过程却非常简单，只需要通过函数avformat_write_header即可，该函数的声明为：
 
 	int avformat_write_header(AVFormatContext *s, AVDictionary **options);
 
@@ -1157,7 +1157,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 
 ###4. 编码和封装循环
 
-以视频流为例。编解码循环的过程实际上可以封装在一个函数Write\_video_frame中。该函数从逻辑上可以分为3个部分：获取原始视频信号、视频编码、写入输出文件。
+以视频流为例。编解码循环的过程实际上可以封装在一个函数Write_video_frame中。该函数从逻辑上可以分为3个部分：获取原始视频信号、视频编码、写入输出文件。
 
 #### (1) 读取原始视频数据
 
@@ -1174,7 +1174,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 		}
 	}
 
-读取视频到AVFrame我们定义一个fill\_yuv_image函数实现：
+读取视频到AVFrame我们定义一个fill_yuv_image函数实现：
 
 	static void fill_yuv_image(AVFrame *pict, int frame_index, int width, int height)
 	{
@@ -1254,7 +1254,7 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 
 #### (2) 视频编码
 
-视频编码的方式同之前几次使用的方式相同，即调用avcodec\_encode_video2，实现方法如：
+视频编码的方式同之前几次使用的方式相同，即调用avcodec_encode_video2，实现方法如：
 	
 	/* encode the image */
 	ret = avcodec_encode_video2(c, &pkt, frame, &got_packet);
@@ -1276,13 +1276,13 @@ AVCodec查找成功后，下一步是分配AVCodecContext实例。分配AVCodecC
 	//	log_packet(fmt_ctx, pkt);
 	return av_interleaved_write_frame(fmt_ctx, pkt);
 
-av\_packet_rescale_ts函数的作用为不同time_base度量之间的转换，在这里起到的作用是将AVCodecContext的time_base转换为AVStream中的time_base。av\_interleaved_write_frame函数的作用是写出AVPacket到输出文件。该函数的声明为：
+av_packet_rescale_ts函数的作用为不同time_base度量之间的转换，在这里起到的作用是将AVCodecContext的time_base转换为AVStream中的time_base。av_interleaved_write_frame函数的作用是写出AVPacket到输出文件。该函数的声明为：
 
 	int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt);
 
 该函数的声明也很简单，第一个参数是之前打开并写入文件头的文件句柄，第二个参数是写入文件的packet。返回值为错误码，成功返回0，失败则返回一个负值。
 
-Write\_video_frame函数的整体实现如：
+Write_video_frame函数的整体实现如：
 
 	int Write_video_frame(AVFormatContext *oc, OutputStream *ost)
 	{
@@ -1357,7 +1357,7 @@ Write\_video_frame函数的整体实现如：
 
 ###5. 写入文件尾，并进行收尾工作
 
-写入文件尾的数据同写文件头一样简单，只需要调用函数av\_write_trailer即可实现：
+写入文件尾的数据同写文件头一样简单，只需要调用函数av_write_trailer即可实现：
 	
 	int av_write_trailer(AVFormatContext *s);
 
@@ -1487,13 +1487,13 @@ Write\_video_frame函数的整体实现如：
 
 	av_dump_format(ofmt_ctx, 0, io_param.outputName, 1);
 
-这里调用了函数avcodec\_copy_context函数，该函数的声明如下：
+这里调用了函数avcodec_copy_context函数，该函数的声明如下：
 
 	int avcodec_copy_context(AVCodecContext *dest, const AVCodecContext *src);
 
 该函数的作用是将src表示的AVCodecContext中的内容拷贝到dest中。
 
-随后，调用avio\_open函数打开输出文件：
+随后，调用avio_open函数打开输出文件：
 
 	av_dump_format(ofmt_ctx, 0, io_param.outputName, 1);
 
@@ -1749,7 +1749,7 @@ Write\_video_frame函数的整体实现如：
 2. 使用预先定义好的filter_graph处理输入frame，生成输出frame；
 3. 将输出frame中的像素值写入输出yuv文件；
 
-第一部分，读取原始yuv的实现由自定义函数Read\_yuv\_data\_to\_buf实现：
+第一部分，读取原始yuv的实现由自定义函数Read_yuv_data_to_buf实现：
 	
 	//从输入yuv文件中读取数据到buffer和frame结构
 	bool Read_yuv_data_to_buf(unsigned char *frame_buffer_in, const IOFiles &files, AVFrame **frameIn)
@@ -1911,7 +1911,7 @@ Write\_video_frame函数的整体实现如：
 		return true;
 	}
 
-在参数读入完成后，需要从表示视频分辨率的字符串中解析出图像的宽和高两个值。我们在命令行中传入的视频分辨率字符串的格式为“width x height”，例如"720x480"。解析过程需要调用av\_parse\_video\_size函数。声明如下：
+在参数读入完成后，需要从表示视频分辨率的字符串中解析出图像的宽和高两个值。我们在命令行中传入的视频分辨率字符串的格式为“width x height”，例如"720x480"。解析过程需要调用av_parse_video_size函数。声明如下：
 
 	int av_parse_video_size(int *width_ptr, int *height_ptr, const char *str);
 
@@ -1940,14 +1940,14 @@ Write\_video_frame函数的整体实现如：
 
 ### 2. 创建SwsContext结构
 
-进行视频的缩放操作离不开libswscale的一个关键的结构，即SwsContext，该结构提供了缩放操作的必要参数。创建该结构需调用函数sws\_getContext。该函数的声明如下：
+进行视频的缩放操作离不开libswscale的一个关键的结构，即SwsContext，该结构提供了缩放操作的必要参数。创建该结构需调用函数sws_getContext。该函数的声明如下：
 
 	struct SwsContext *sws_getContext(int srcW, int srcH, enum AVPixelFormat srcFormat,
 	                                  int dstW, int dstH, enum AVPixelFormat dstFormat,
 	                                  int flags, SwsFilter *srcFilter,
              	                     SwsFilter *dstFilter, const double *param);
 
-该函数的前两行参数分别表示输入和输出图像的宽、高、像素格式，参数flags表示采样和差值使用的算法，常用的有SWS\_BILINEAR表示双线性差值等。剩余的不常用参数通常设为NULL。创建该结构的代码如：
+该函数的前两行参数分别表示输入和输出图像的宽、高、像素格式，参数flags表示采样和差值使用的算法，常用的有SWS_BILINEAR表示双线性差值等。剩余的不常用参数通常设为NULL。创建该结构的代码如：
 
 	//创建SwsContext结构
 	enum AVPixelFormat src_pix_fmt = AV_PIX_FMT_YUV420P;
@@ -1994,7 +1994,7 @@ Write\_video_frame函数的整体实现如：
 		fwrite(dst_data[0], 1, dst_bufsize, files.oFile);
 	}
 
-其核心函数为sws\_scale，其声明为：
+其核心函数为sws_scale，其声明为：
 
 	int sws_scale(struct SwsContext *c, const uint8_t *const srcSlice[],
               const int srcStride[], int srcSliceY, int srcSliceH,
