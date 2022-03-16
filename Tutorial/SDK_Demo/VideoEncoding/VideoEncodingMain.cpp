@@ -5,108 +5,101 @@
 
 /*************************************************
 Function:		hello
-Description:	Êä³öÌáÊ¾ĞÅÏ¢ºÍÃüÁîĞĞ¸ñÊ½
-Calls:			ÎŞ
+Description:	è¾“å‡ºæç¤ºä¿¡æ¯å’Œå‘½ä»¤è¡Œæ ¼å¼
+Calls:			æ— 
 Called By:		main
-Input:			ÎŞ
-Output:			ÎŞ
-Return:			ÎŞ
+Input:			æ— 
+Output:			æ— 
+Return:			æ— 
 *************************************************/
-void hello()
-{
-	printf("*********************************\n");
-	printf("VideoEncoding: A FFmpeg SDK demo.\nDeveloped by Yin Wenjie\n");
-	printf("*********************************\n");
-	printf("=================================\nCompulsory Paramaters:\n");
-	printf("\t-i:\tInput YUV file name\n");
-	printf("\t-o:\tOutput stream file name\n");
-	printf("\t-w:\tInput frame width\n");
-	printf("\t-h:\tInput frame height\n");
-	printf("\t-br:\tInput bit rate\n");
-	printf("\t-tf:\tTotal frames to encode\n");
-	printf("=================================\nOptional Paramaters:\n");
-	printf("\t-fr:\tFrame rate\n");
-	printf("\t-gs:\tGOP size\n");
-	printf("\t-mbf:\tMax B Frames\n");
-	printf("*********************************\n");
+void hello() {
+    printf("*********************************\n");
+    printf("VideoEncoding: A FFmpeg SDK demo.\nDeveloped by Yin Wenjie\n");
+    printf("*********************************\n");
+    printf("=================================\nCompulsory Paramaters:\n");
+    printf("\t-i:\tInput YUV file name\n");
+    printf("\t-o:\tOutput stream file name\n");
+    printf("\t-w:\tInput frame width\n");
+    printf("\t-h:\tInput frame height\n");
+    printf("\t-br:\tInput bit rate\n");
+    printf("\t-tf:\tTotal frames to encode\n");
+    printf("=================================\nOptional Paramaters:\n");
+    printf("\t-fr:\tFrame rate\n");
+    printf("\t-gs:\tGOP size\n");
+    printf("\t-mbf:\tMax B Frames\n");
+    printf("*********************************\n");
 }
 
 /*************************************************
 Function:		main
-Description:	Èë¿Úµãº¯Êı
+Description:	å…¥å£ç‚¹å‡½æ•°
 *************************************************/
-int main(int argc, char **argv)
-{
-	hello();									//Êä³öÌáÊ¾ĞÅÏ¢
+int main(int argc, char **argv) {
+    hello();                                    //è¾“å‡ºæç¤ºä¿¡æ¯
 
-	IOParam io_param;
-	if (Parse_input_param(argc, argv, io_param))//¶ÁÈ¡²¢½âÎöÃüÁîĞĞ²ÎÊı
-	{
-		printf("Error: Incomplete input parameters. Please check the command line.");
-	}
-	
-	
-	CodecCtx ctx = { NULL, NULL, NULL};
-	int frameIdx, packetIdx = 0, ret, got_output;
+    IOParam io_param;
+    if (Parse_input_param(argc, argv, io_param))//è¯»å–å¹¶è§£æå‘½ä»¤è¡Œå‚æ•°
+    {
+        printf("Error: Incomplete input parameters. Please check the command line.");
+    }
 
-	Open_file(io_param);						//´ò¿ªÊäÈëÊä³öÎÄ¼ş
-	Open_encoder(ctx, io_param);				//¸ù¾İÊäÈë²ÎÊıÉèÖÃ²¢´ò¿ª±àÂëÆ÷¸÷¸ö²¿¼ş
 
-	/* encode 1 second of video */
-	for (frameIdx = 0; frameIdx < io_param.nTotalFrames; frameIdx++)
-	{
-		av_init_packet(&(ctx.pkt));				//³õÊ¼»¯AVPacketÊµÀı
-		ctx.pkt.data = NULL;					// packet data will be allocated by the encoder
-		ctx.pkt.size = 0;
+    CodecCtx ctx = {NULL, NULL, NULL};
+    int frameIdx, packetIdx = 0, ret, got_output;
 
-		fflush(stdout);
-				
-		Read_yuv_data(ctx, io_param, 0);		//Y·ÖÁ¿
-		Read_yuv_data(ctx, io_param, 1);		//U·ÖÁ¿
-		Read_yuv_data(ctx, io_param, 2);		//V·ÖÁ¿
+    Open_file(io_param);                        //æ‰“å¼€è¾“å…¥è¾“å‡ºæ–‡ä»¶
+    Open_encoder(ctx, io_param);                //æ ¹æ®è¾“å…¥å‚æ•°è®¾ç½®å¹¶æ‰“å¼€ç¼–ç å™¨å„ä¸ªéƒ¨ä»¶
 
-		ctx.frame->pts = frameIdx;
+    /* encode 1 second of video */
+    for (frameIdx = 0; frameIdx < io_param.nTotalFrames; frameIdx++) {
+        av_init_packet(&(ctx.pkt));                //åˆå§‹åŒ–AVPacketå®ä¾‹
+        ctx.pkt.data = NULL;                    // packet data will be allocated by the encoder
+        ctx.pkt.size = 0;
 
-		/* encode the image */
-		ret = avcodec_encode_video2(ctx.c, &(ctx.pkt), ctx.frame, &got_output);	//½«AVFrameÖĞµÄÏñËØĞÅÏ¢±àÂëÎªAVPacketÖĞµÄÂëÁ÷
-		if (ret < 0) 
-		{
-			fprintf(stderr, "Error encoding frame\n");
-			exit(1);
-		}
-		printf("Encode frame index: %d, frame pts: %d.\n", frameIdx, ctx.frame->pts);
-		if (got_output) 
-		{
-			//»ñµÃÒ»¸öÍêÕûµÄÂëÁ÷°ü
-			printf("Write packets %3d (size=%5d). Packet pts: %d\n", packetIdx++, ctx.pkt.size, ctx.pkt.pts);
-			fwrite(ctx.pkt.data, 1, ctx.pkt.size, io_param.pFout);
-			av_packet_unref(&(ctx.pkt));
-		}
-	} //for (frameIdx = 0; frameIdx < io_param.nTotalFrames; frameIdx++)
+        fflush(stdout);
 
-	/* get the delayed frames */
-	for (got_output = 1; got_output; frameIdx++) 
-	{
-		fflush(stdout);
+        Read_yuv_data(ctx, io_param, 0);        //Yåˆ†é‡
+        Read_yuv_data(ctx, io_param, 1);        //Uåˆ†é‡
+        Read_yuv_data(ctx, io_param, 2);        //Våˆ†é‡
 
-		ret = avcodec_encode_video2(ctx.c, &(ctx.pkt), NULL, &got_output);		//Êä³ö±àÂëÆ÷ÖĞÊ£ÓàµÄÂëÁ÷
-		if (ret < 0)
-		{
-			fprintf(stderr, "Error encoding frame\n");
-			exit(1);
-		}
+        ctx.frame->pts = frameIdx;
 
-		if (got_output) 
-		{
-			printf("Cached frames: Write packets %3d (size=%5d). Packet pts: %d\n", packetIdx++, ctx.pkt.size, ctx.pkt.pts);
-			fwrite(ctx.pkt.data, 1, ctx.pkt.size, io_param.pFout);
-			av_packet_unref(&(ctx.pkt));
-		}
-	} //for (got_output = 1; got_output; frameIdx++) 
+        /* encode the image */
+        ret = avcodec_encode_video2(ctx.c, &(ctx.pkt), ctx.frame, &got_output);    //å°†AVFrameä¸­çš„åƒç´ ä¿¡æ¯ç¼–ç ä¸ºAVPacketä¸­çš„ç æµ
+        if (ret < 0) {
+            fprintf(stderr, "Error encoding frame\n");
+            exit(1);
+        }
+        printf("Encode frame index: %d, frame pts: %d.\n", frameIdx, ctx.frame->pts);
+        if (got_output) {
+            //è·å¾—ä¸€ä¸ªå®Œæ•´çš„ç æµåŒ…
+            printf("Write packets %3d (size=%5d). Packet pts: %d\n", packetIdx++, ctx.pkt.size, ctx.pkt.pts);
+            fwrite(ctx.pkt.data, 1, ctx.pkt.size, io_param.pFout);
+            av_packet_unref(&(ctx.pkt));
+        }
+    } //for (frameIdx = 0; frameIdx < io_param.nTotalFrames; frameIdx++)
 
-	//½áÎ²´¦Àí
-	Close_file(io_param);
-	Close_encoder(ctx);
+    /* get the delayed frames */
+    for (got_output = 1; got_output; frameIdx++) {
+        fflush(stdout);
 
-	return 0;
+        ret = avcodec_encode_video2(ctx.c, &(ctx.pkt), NULL, &got_output);        //è¾“å‡ºç¼–ç å™¨ä¸­å‰©ä½™çš„ç æµ
+        if (ret < 0) {
+            fprintf(stderr, "Error encoding frame\n");
+            exit(1);
+        }
+
+        if (got_output) {
+            printf("Cached frames: Write packets %3d (size=%5d). Packet pts: %d\n", packetIdx++, ctx.pkt.size,
+                   ctx.pkt.pts);
+            fwrite(ctx.pkt.data, 1, ctx.pkt.size, io_param.pFout);
+            av_packet_unref(&(ctx.pkt));
+        }
+    } //for (got_output = 1; got_output; frameIdx++)
+
+    //ç»“å°¾å¤„ç†
+    Close_file(io_param);
+    Close_encoder(ctx);
+
+    return 0;
 }
